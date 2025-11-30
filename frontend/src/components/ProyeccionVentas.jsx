@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import {
   obtenerTiendasPorPais,
   obtenerResumenProyeccion,
+  crearProyeccion,
   actualizarProyeccion,
   cerrarProyeccion
 } from '../services/api'
-import './ProyeccionVentas.css'
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -61,28 +61,50 @@ function ProyeccionVentas({ user }) {
     }
   }, [tiendaSeleccionada, anio])
 
-  const handleEditarMonto = (proyeccionId, montoActual) => {
-    setEditando({ ...editando, [proyeccionId]: montoActual })
+  const handleEditarMonto = (mesNumero, montoActual, proyeccionId) => {
+    const key = proyeccionId || `new_${mesNumero}`
+    setEditando({ ...editando, [key]: { valor: montoActual || '', mes: mesNumero, id: proyeccionId } })
   }
 
-  const handleCancelarEdicion = (proyeccionId) => {
+  const handleCancelarEdicion = (key) => {
     const newEditando = { ...editando }
-    delete newEditando[proyeccionId]
+    delete newEditando[key]
     setEditando(newEditando)
   }
 
-  const handleGuardarMonto = async (proyeccionId) => {
+  const handleGuardarMonto = async (key) => {
     try {
-      await actualizarProyeccion({
-        proyeccionVentaId: proyeccionId,
-        montoProyectado: parseFloat(editando[proyeccionId])
-      })
-      setMensaje('Proyección actualizada exitosamente')
+      const datos = editando[key]
+      const monto = parseFloat(datos.valor)
+      
+      if (isNaN(monto) || monto < 0) {
+        setError('El monto debe ser un número válido mayor o igual a 0')
+        return
+      }
+
+      if (datos.id) {
+        // Actualizar proyección existente
+        await actualizarProyeccion({
+          proyeccionVentaId: datos.id,
+          montoProyectado: monto
+        })
+        setMensaje('Proyección actualizada exitosamente')
+      } else {
+        // Crear nueva proyección
+        await crearProyeccion({
+          tiendaId: tiendaSeleccionada,
+          anio: anio,
+          mes: datos.mes,
+          montoProyectado: monto
+        })
+        setMensaje('Proyección creada exitosamente')
+      }
+      
       setTimeout(() => setMensaje(''), 3000)
-      handleCancelarEdicion(proyeccionId)
+      handleCancelarEdicion(key)
       cargarResumen()
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al actualizar proyección')
+      setError(err.response?.data?.message || 'Error al guardar proyección')
     }
   }
 
@@ -196,37 +218,56 @@ function ProyeccionVentas({ user }) {
                 <td className="monto">{formatearMoneda(mes.venta2024)}</td>
                 <td className="monto">{formatearMoneda(mes.venta2025)}</td>
                 <td className="monto">
-                  {!esCerrado && mes.proyeccion2026 != null ? (
-                    editando[mes.proyeccion2026] !== undefined ? (
-                      <div className="edicion-monto">
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={editando[mes.proyeccion2026]}
-                          onChange={(e) => setEditando({ ...editando, [mes.proyeccion2026]: e.target.value })}
-                          className="input-monto"
-                        />
-                        <button 
-                          onClick={() => handleGuardarMonto(mes.proyeccion2026)}
-                          className="btn-guardar-mini"
+                  {!esCerrado ? (
+                    (() => {
+                      const key = mes.proyeccionVentaId || `new_${mes.mes}`
+                      const enEdicion = editando[key]
+                      
+                      if (enEdicion) {
+                        return (
+                          <div className="edicion-monto">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={enEdicion.valor}
+                              onChange={(e) => setEditando({ 
+                                ...editando, 
+                                [key]: { ...enEdicion, valor: e.target.value }
+                              })}
+                              className="input-monto"
+                              autoFocus
+                            />
+                            <button 
+                              onClick={() => handleGuardarMonto(key)}
+                              className="btn-guardar-mini"
+                              title="Guardar"
+                            >
+                              ✓
+                            </button>
+                            <button 
+                              onClick={() => handleCancelarEdicion(key)}
+                              className="btn-cancelar-mini"
+                              title="Cancelar"
+                            >
+                              ✗
+                            </button>
+                          </div>
+                        )
+                      }
+                      
+                      return (
+                        <div 
+                          className="monto-editable" 
+                          onClick={() => handleEditarMonto(mes.mes, mes.proyeccion2026, mes.proyeccionVentaId)}
+                          title={mes.proyeccionVentaId ? "Click para editar" : "Click para agregar proyección"}
                         >
-                          ✓
-                        </button>
-                        <button 
-                          onClick={() => handleCancelarEdicion(mes.proyeccion2026)}
-                          className="btn-cancelar-mini"
-                        >
-                          ✗
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="monto-editable" onClick={() => handleEditarMonto(mes.proyeccion2026, mes.proyeccion2026)}>
-                        {formatearMoneda(mes.proyeccion2026)}
-                        <span className="icono-editar">✎</span>
-                      </div>
-                    )
+                          {mes.proyeccion2026 ? formatearMoneda(mes.proyeccion2026) : <span className="sin-dato">-- Click para agregar --</span>}
+                          <span className="icono-editar">✎</span>
+                        </div>
+                      )
+                    })()
                   ) : (
-                    formatearMoneda(mes.proyeccion2026)
+                    mes.proyeccion2026 ? formatearMoneda(mes.proyeccion2026) : <span className="sin-dato">Sin datos</span>
                   )}
                 </td>
                 <td className={`porcentaje ${getPorcentajeClass(mes.porcentajeCrecimiento)}`}>

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { login } from '../services/api'
-import './Login.css'
 
 function Login({ onLogin }) {
   const [nombreUsuario, setNombreUsuario] = useState('')

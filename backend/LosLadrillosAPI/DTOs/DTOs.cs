@@ -71,6 +71,7 @@ namespace LosLadrillosAPI.DTOs
         public string NombreMes { get; set; } = string.Empty;
         public decimal? Venta2024 { get; set; }
         public decimal? Venta2025 { get; set; }
+        public int? ProyeccionVentaId { get; set; }
         public decimal? Proyeccion2026 { get; set; }
         public decimal? PorcentajeCrecimiento { get; set; }
     }

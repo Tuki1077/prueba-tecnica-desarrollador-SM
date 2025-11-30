@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import Login from './components/Login'
 import ProyeccionVentas from './components/ProyeccionVentas'
 import Bitacora from './components/Bitacora'
-import './App.css'
+import './styles/global.css'
 
 function App() {
   const [user, setUser] = useState(null)

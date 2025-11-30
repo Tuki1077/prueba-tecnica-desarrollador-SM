@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { obtenerBitacoras } from '../services/api'
-import './Bitacora.css'
 
 function Bitacora() {
   const navigate = useNavigate()

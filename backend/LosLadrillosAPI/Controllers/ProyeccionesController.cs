@@ -75,6 +75,7 @@ namespace LosLadrillosAPI.Controllers
                     NombreMes = mesesNombres[mes],
                     Venta2024 = venta2024?.MontoVenta,
                     Venta2025 = venta2025?.MontoVenta,
+                    ProyeccionVentaId = proyeccion?.ProyeccionVentaId,
                     Proyeccion2026 = proyeccion?.MontoProyectado,
                     PorcentajeCrecimiento = porcentajeCrecimiento
                 });
@@ -205,7 +206,7 @@ namespace LosLadrillosAPI.Controllers
 
             // Registrar en bitácora
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            await _bitacoraService.RegistrarAccionAsync(usuarioId, "CIERRE", "ProyeccionesVentas", 
+            await _bitacoraService.RegistrarAccionAsync(usuarioId, "CERRAR", "ProyeccionesVentas", 
                 tiendaId, null, $"Cerradas {proyecciones.Count} proyecciones del año {anio}", ip);
 
             return Ok(new { message = $"Se cerraron {proyecciones.Count} proyecciones exitosamente" });

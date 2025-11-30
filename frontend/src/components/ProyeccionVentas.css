@@ -172,6 +172,12 @@
   opacity: 1;
 }
 
+.sin-dato {
+  color: #95a5a6;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
 .edicion-monto {
   display: flex;
   gap: 0.5rem;
