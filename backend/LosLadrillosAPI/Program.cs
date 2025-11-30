@@ -43,21 +43,23 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+// CORS - Deshabilitado porque Nginx maneja CORS
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowAll", policy =>
+//     {
+//         policy.AllowAnyOrigin()
+//               .AllowAnyMethod()
+//               .AllowAnyHeader();
+//     });
+// });
 
 // Controladores
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true; // Permite camelCase desde frontend
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // Serializa en camelCase
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
@@ -106,21 +108,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Aplicar migraciones automáticamente
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
-        Console.WriteLine("✓ Migraciones aplicadas exitosamente");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"✗ Error al aplicar migraciones: {ex.Message}");
-    }
-}
+// Nota: Las tablas se crean mediante scripts SQL en el contenedor de SQL Server
+// No se usan migraciones de Entity Framework en este proyecto
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -133,7 +122,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
 }
 
-app.UseCors("AllowAll");
+// app.UseCors("AllowAll"); // Deshabilitado - Nginx maneja CORS
 
 app.UseAuthentication();
 app.UseAuthorization();

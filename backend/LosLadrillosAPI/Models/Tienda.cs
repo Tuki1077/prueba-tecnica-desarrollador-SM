@@ -7,20 +7,25 @@ namespace LosLadrillosAPI.Models
     public class Tienda
     {
         [Key]
+        [Column("id")]
         public int TiendaId { get; set; }
 
         [Required]
         [StringLength(10)]
+        [Column("codigo")]
         public string CodigoTienda { get; set; } = string.Empty; // 10, 20, 30
 
         [Required]
         [StringLength(100)]
+        [Column("nombre")]
         public string NombreTienda { get; set; } = string.Empty; // Ciudad, Petén, Xela
 
         [Required]
+        [Column("pais_id")]
         public int PaisId { get; set; }
 
         [Required]
+        [Column("activo")]
         public bool Activa { get; set; } = true;
 
         // Relaciones

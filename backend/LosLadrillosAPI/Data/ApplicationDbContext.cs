@@ -23,21 +23,15 @@ namespace LosLadrillosAPI.Data
 
             // Configurar relaciones
             modelBuilder.Entity<ProyeccionVenta>()
-                .HasOne(p => p.UsuarioRegistro)
+                .HasOne(p => p.UsuarioCreacion)
                 .WithMany()
-                .HasForeignKey(p => p.UsuarioRegistroId)
+                .HasForeignKey(p => p.UsuarioCreacionId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<ProyeccionVenta>()
                 .HasOne(p => p.UsuarioModificacion)
                 .WithMany()
                 .HasForeignKey(p => p.UsuarioModificacionId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ProyeccionVenta>()
-                .HasOne(p => p.UsuarioCierre)
-                .WithMany()
-                .HasForeignKey(p => p.UsuarioCierreId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Índices únicos

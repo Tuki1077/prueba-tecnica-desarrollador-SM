@@ -131,8 +131,8 @@ namespace LosLadrillosAPI.Controllers
                 Mes = dto.Mes,
                 MontoProyectado = dto.MontoProyectado,
                 Estado = "ABIERTO",
-                UsuarioRegistroId = ObtenerUsuarioId(),
-                FechaRegistro = DateTime.Now
+                UsuarioCreacionId = ObtenerUsuarioId(),
+                FechaCreacion = DateTime.Now
             };
 
             _context.ProyeccionesVentas.Add(proyeccion);
@@ -197,7 +197,6 @@ namespace LosLadrillosAPI.Controllers
                 if (proyeccion.Estado == "ABIERTO")
                 {
                     proyeccion.Estado = "CERRADO";
-                    proyeccion.UsuarioCierreId = usuarioId;
                     proyeccion.FechaCierre = fechaCierre;
                 }
             }

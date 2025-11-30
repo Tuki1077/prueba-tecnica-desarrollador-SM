@@ -1,12 +1,11 @@
-version: '3.8'
-
 services:
   # ==================================================
-  # SQL Server 2022 (Azure SQL Edge para Mac ARM64)
+  # SQL Server 2022
   # ==================================================
   sqlserver:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: losladrillos-sqlserver
+    platform: linux/amd64
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=LosLadrillos2024!
@@ -14,18 +13,18 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - sqlserver_data:/var/opt/mssql/data
-      - sqlserver_log:/var/opt/mssql/log
-      - sqlserver_secrets:/var/opt/mssql/secrets
-      - ./database:/docker-entrypoint-initdb.d
+      - sqlserver_data:/var/opt/mssql
+      - ./database:/docker-entrypoint-initdb.d:ro
+      - ./database/entrypoint.sh:/entrypoint.sh:ro
     networks:
       - losladrillos-network
+    command: /bin/bash /entrypoint.sh
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P LosLadrillos2024! -Q 'SELECT 1' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'LosLadrillos2024!' -C -Q 'SELECT 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
 
   # ==================================================
   # Backend API (.NET 8)
@@ -37,14 +36,14 @@ services:
     container_name: losladrillos-backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://+:5001
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=VentasProyeccion;User Id=sa;Password=LosLadrillos2024!;TrustServerCertificate=True;
       - Jwt__Secret=LosLadrillos-SuperSecretKey-2024-ProyeccionVentas-JWT
       - Jwt__Issuer=LosLadrillosAPI
       - Jwt__Audience=LosLadrillosClient
       - Jwt__ExpirationMinutes=480
     ports:
-      - "5000:5000"
+      - "5001:5001"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -60,7 +59,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=http://localhost/api
+        - VITE_API_URL=http://localhost/api
     container_name: losladrillos-frontend
     ports:
       - "3000:80"
@@ -88,15 +87,26 @@ services:
       - losladrillos-network
     restart: unless-stopped
 
+  # ==================================================
+  # Inicializador de usuarios (se ejecuta una vez y termina)
+  # ==================================================
+  user-init:
+    image: curlimages/curl:latest
+    container_name: losladrillos-user-init
+    volumes:
+      - ./database/05-create-users.sh:/create-users.sh:ro
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - losladrillos-network
+    command: sh /create-users.sh
+
 # ==================================================
 # Volúmenes persistentes
 # ==================================================
 volumes:
   sqlserver_data:
-    driver: local
-  sqlserver_log:
-    driver: local
-  sqlserver_secrets:
     driver: local
 
 # ==================================================

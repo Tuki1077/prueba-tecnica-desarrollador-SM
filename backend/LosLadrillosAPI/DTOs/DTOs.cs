@@ -14,6 +14,14 @@ namespace LosLadrillosAPI.DTOs
         public int UsuarioId { get; set; }
     }
 
+    public class RegisterRequestDto
+    {
+        public string NombreUsuario { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string? NombreCompleto { get; set; }
+        public string Rol { get; set; } = "GERENTE";
+    }
+
     public class ProyeccionVentaDto
     {
         public int ProyeccionVentaId { get; set; }
@@ -24,7 +32,7 @@ namespace LosLadrillosAPI.DTOs
         public int Mes { get; set; }
         public decimal MontoProyectado { get; set; }
         public string Estado { get; set; } = string.Empty;
-        public DateTime FechaRegistro { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public DateTime? FechaModificacion { get; set; }
         public DateTime? FechaCierre { get; set; }
     }

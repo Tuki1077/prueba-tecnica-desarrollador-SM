@@ -3,36 +3,42 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LosLadrillosAPI.Models
 {
-    [Table("Bitacoras")]
+    [Table("BitacoraMovimientos")]
     public class Bitacora
     {
         [Key]
+        [Column("id")]
         public int BitacoraId { get; set; }
 
         [Required]
+        [Column("usuario_id")]
         public int UsuarioId { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string Accion { get; set; } = string.Empty; // INSERT, UPDATE, DELETE, LOGIN, CIERRE
+        [Column("accion")]
+        public string Accion { get; set; } = string.Empty; // INSERT, UPDATE, DELETE, CERRAR, ABRIR
 
         [Required]
-        [StringLength(100)]
+        [StringLength(50)]
+        [Column("tabla")]
         public string Tabla { get; set; } = string.Empty;
 
-        public int? RegistroId { get; set; }
+        [Required]
+        [Column("registro_id")]
+        public int RegistroId { get; set; }
 
-        [StringLength(1000)]
+        [Column("valores_anteriores")]
         public string? ValoresAnteriores { get; set; }
 
-        [StringLength(1000)]
+        [Column("valores_nuevos")]
         public string? ValoresNuevos { get; set; }
 
-        [Required]
-        public DateTime FechaHora { get; set; } = DateTime.Now;
-
-        [StringLength(50)]
+        [Column("ip_address")]
         public string? DireccionIP { get; set; }
+
+        [Column("fecha_accion")]
+        public DateTime FechaHora { get; set; } = DateTime.Now;
 
         // Relaciones
         [ForeignKey("UsuarioId")]

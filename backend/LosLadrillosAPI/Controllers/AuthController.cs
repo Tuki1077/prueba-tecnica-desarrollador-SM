@@ -53,16 +53,21 @@ namespace LosLadrillosAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<Usuario>> Register([FromBody] Usuario usuario)
+        public async Task<ActionResult<Usuario>> Register([FromBody] RegisterRequestDto request)
         {
             // Verificar si ya existe el usuario
-            if (await _context.Usuarios.AnyAsync(u => u.NombreUsuario == usuario.NombreUsuario))
+            if (await _context.Usuarios.AnyAsync(u => u.NombreUsuario == request.NombreUsuario))
                 return BadRequest(new { message = "El nombre de usuario ya existe" });
 
-            // Hash del password
-            usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
-            usuario.FechaCreacion = DateTime.Now;
-            usuario.Activo = true;
+            var usuario = new Usuario
+            {
+                NombreUsuario = request.NombreUsuario,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                NombreCompleto = string.IsNullOrEmpty(request.NombreCompleto) ? request.NombreUsuario : request.NombreCompleto,
+                Rol = request.Rol,
+                Activo = true,
+                FechaCreacion = DateTime.Now
+            };
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();

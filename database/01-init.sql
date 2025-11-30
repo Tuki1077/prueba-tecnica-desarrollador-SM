@@ -127,7 +127,7 @@ BEGIN
     CREATE TABLE BitacoraMovimientos (
         id INT PRIMARY KEY IDENTITY(1,1),
         usuario_id INT NOT NULL,
-        accion VARCHAR(50) NOT NULL CHECK (accion IN ('INSERT', 'UPDATE', 'DELETE', 'CERRAR', 'ABRIR')),
+        accion VARCHAR(50) NOT NULL CHECK (accion IN ('INSERT', 'UPDATE', 'DELETE', 'CERRAR', 'ABRIR', 'LOGIN')),
         tabla VARCHAR(50) NOT NULL,
         registro_id INT NOT NULL,
         valores_anteriores NVARCHAR(MAX) NULL,

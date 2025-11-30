@@ -80,39 +80,10 @@ GO
 
 -- ==================================================
 -- INSERTAR USUARIOS
--- Password: Admin123! (hash BCrypt)
+-- Los usuarios se crean mediante el endpoint /api/auth/register después de que el backend esté disponible
+-- Ver script: 05-create-users.sh
+-- Credenciales: gerente/gerente123 y admin/admin123
 -- ==================================================
-SET IDENTITY_INSERT Usuarios ON;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE username = 'gerente')
-BEGIN
-    INSERT INTO Usuarios (id, username, password_hash, nombre_completo, rol, activo) 
-    VALUES (
-        1, 
-        'gerente', 
-        '$2a$11$YQ3mD8J5JqJ5z5QX7xZMYe0kH3LqH1LqH1LqH1LqH1LqH1LqH1Lq.', -- Admin123!
-        'Juan Pérez García', 
-        'GERENTE', 
-        1
-    );
-END
-
-IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE username = 'admin')
-BEGIN
-    INSERT INTO Usuarios (id, username, password_hash, nombre_completo, rol, activo) 
-    VALUES (
-        2, 
-        'admin', 
-        '$2a$11$YQ3mD8J5JqJ5z5QX7xZMYe0kH3LqH1LqH1LqH1LqH1LqH1LqH1Lq.', -- Admin123!
-        'María López Ramírez', 
-        'ADMIN', 
-        1
-    );
-END
-
-SET IDENTITY_INSERT Usuarios OFF;
-GO
 
 PRINT 'Usuarios insertados correctamente';
 PRINT 'Usuario: gerente / Password: Admin123!';

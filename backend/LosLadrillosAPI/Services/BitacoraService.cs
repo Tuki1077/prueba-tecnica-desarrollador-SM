@@ -6,7 +6,7 @@ namespace LosLadrillosAPI.Services
 {
     public interface IBitacoraService
     {
-        Task RegistrarAccionAsync(int usuarioId, string accion, string tabla, int? registroId = null, 
+        Task RegistrarAccionAsync(int usuarioId, string accion, string tabla, int registroId, 
             string? valoresAnteriores = null, string? valoresNuevos = null, string? direccionIP = null);
         Task<List<Bitacora>> ObtenerBitacorasAsync(DateTime? fechaInicio = null, DateTime? fechaFin = null, 
             int? usuarioId = null, string? accion = null);
@@ -22,7 +22,7 @@ namespace LosLadrillosAPI.Services
         }
 
         public async Task RegistrarAccionAsync(int usuarioId, string accion, string tabla, 
-            int? registroId = null, string? valoresAnteriores = null, string? valoresNuevos = null, 
+            int registroId, string? valoresAnteriores = null, string? valoresNuevos = null, 
             string? direccionIP = null)
         {
             var bitacora = new Bitacora
