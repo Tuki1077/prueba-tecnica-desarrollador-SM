@@ -311,4 +311,4 @@ Todos los estilos en `frontend/src/styles/global.css` (9.4 KB):
 
 **Conclusión**: Este proyecto demuestra capacidad para desarrollar aplicaciones full-stack con arquitectura moderna, resolver problemas técnicos complejos y mantener código limpio y escalable.
 
-**Tiempo Total de Desarrollo**: 25 horas (incluye debugging, optimizaciones y documentación)
+**Tiempo Total de Desarrollo**: 48 horas (incluye debugging, optimizaciones y documentación)
