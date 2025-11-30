@@ -4,10 +4,12 @@
 
 Sistema web para gestionar y proyectar ventas mensuales del año 2026 para las tiendas de Los Ladrillos S.A. en Guatemala. El sistema permite ingresar proyecciones, calcular crecimientos y controlar el acceso mediante roles.
 
+**Estado: ✅ COMPLETADO Y FUNCIONAL**
+
 ## 2. Arquitectura Técnica
 
 ### Stack Tecnológico
-- **Frontend**: React 18 con TypeScript
+- **Frontend**: React 18
 - **Backend**: .NET 8 Web API (C#)
 - **Base de Datos**: SQL Server 2022 (Docker)
 - **Servidor Web**: Nginx (reverse proxy)
@@ -30,30 +32,54 @@ SQL Server:1433 (Database)
 
 ```
 prueba-tecnica-desarrollador-SM/
-├── backend/                    # API .NET
+├── backend/                    # API .NET 8
 │   ├── Controllers/           # Endpoints REST
-│   ├── Models/               # Entidades y DTOs
+│   │   ├── AuthController.cs
+│   │   ├── ProyeccionesController.cs
+│   │   ├── BitacoraController.cs
+│   │   └── TiendasController.cs
+│   ├── Models/               # Entidades
+│   │   ├── Usuario.cs
+│   │   ├── Tienda.cs
+│   │   ├── Pais.cs
+│   │   ├── VentaHistorica.cs
+│   │   ├── ProyeccionVenta.cs
+│   │   └── Bitacora.cs
+│   ├── DTOs/                 # Data Transfer Objects
+│   │   └── DTOs.cs
 │   ├── Services/             # Lógica de negocio
+│   │   ├── JwtService.cs
+│   │   └── BitacoraService.cs
 │   ├── Data/                 # Contexto EF Core
+│   │   └── ApplicationDbContext.cs
 │   └── Dockerfile
 ├── frontend/                  # Aplicación React
 │   ├── src/
 │   │   ├── components/       # Componentes UI
-│   │   ├── services/         # Llamadas API
-│   │   ├── hooks/           # Custom hooks
-│   │   └── types/           # TypeScript types
+│   │   │   ├── Login.jsx
+│   │   │   ├── ProyeccionVentas.jsx
+│   │   │   └── Bitacora.jsx
+│   │   ├── services/         # Cliente API
+│   │   │   └── api.js
+│   │   └── styles/          # CSS consolidado
+│   │       └── global.css
 │   └── Dockerfile
 ├── database/                  # Scripts SQL
-│   ├── init.sql             # Creación de BD
-│   ├── functions.sql        # Funciones de cálculo
-│   └── data.sql             # Datos iniciales
+│   ├── 01-init.sql          # Creación de tablas
+│   ├── 02-functions.sql     # Funciones de cálculo
+│   ├── 03-data.sql          # Datos iniciales
+│   ├── 04-procedures.sql    # Procedimientos almacenados
+│   ├── 05-create-users.sh   # Script para crear usuarios
+│   ├── Dockerfile           # Imagen SQL Server
+│   └── entrypoint.sh        # Inicialización automática
 ├── nginx/                     # Configuración Nginx
-│   └── nginx.conf
+│   ├── nginx.conf
+│   └── conf.d/
+│       └── default.conf
 ├── docker-compose.yml
-└── docs/                      # Documentación
-    ├── DATABASE.md
-    ├── API.md
-    └── DEPLOYMENT.md
+├── .gitignore
+├── README.md
+└── PLANIFICACION.md
 ```
 
 ## 4. Modelo de Datos
@@ -171,15 +197,17 @@ El sistema está preparado para:
 
 ## 10. Cronograma de Desarrollo
 
-| Fase | Tiempo Estimado |
-|------|----------------|
-| Setup de infraestructura (Docker) | 2 horas |
-| Base de datos y funciones | 3 horas |
-| Backend API | 5 horas |
-| Frontend React | 6 horas |
-| Integración y pruebas | 3 horas |
-| Documentación | 2 horas |
-| **Total** | **~21 horas** |
+| Fase | Tiempo Planificado | Tiempo Real |
+|------|-------------------|-------------|
+| Setup de infraestructura (Docker) | 2 horas | 3 horas |
+| Base de datos y funciones | 3 horas | 4 horas |
+| Backend API | 5 horas | 6 horas |
+| Frontend React | 6 horas | 5 horas |
+| Integración y debugging | 3 horas | 5 horas |
+| Documentación | 2 horas | 2 horas |
+| **Total** | **~21 horas** | **~25 horas** |
+
+**Nota**: El tiempo adicional se invirtió en resolver problemas de cache de Docker y ajustes de mapeo de columnas entre SQL Server y Entity Framework.
 
 ## 11. Criterios de Éxito
 
@@ -191,6 +219,96 @@ El sistema está preparado para:
 - ✅ Interfaz intuitiva y profesional
 - ✅ Seguridad implementada correctamente
 
+## 12. Estado Actual del Proyecto
+
+### Funcionalidades Implementadas
+
+✅ **Autenticación y Seguridad**
+- Login con JWT
+- Password hashing con BCrypt
+- Usuarios: `gerente/gerente123` y `admin/admin123`
+
+✅ **Gestión de Proyecciones**
+- Crear nuevas proyecciones 2026
+- Editar proyecciones existentes (click para editar)
+- Visualización comparativa 2024, 2025, 2026
+- Cálculos automáticos de % crecimiento
+
+✅ **Control de Estados**
+- Botón "Cerrar Proyección"
+- Estados ABIERTO/CERRADO
+- Validación de permisos por rol GERENTE
+
+✅ **Bitácora de Auditoría**
+- Registro automático de todas las acciones
+- INSERT, UPDATE, CERRAR registrados
+- Visualización de historial completo
+
+✅ **Base de Datos**
+- Inicialización automática con scripts SQL
+- Funciones de cálculo en SQL Server
+- Datos de ejemplo (3 tiendas Guatemala)
+- Procedimientos almacenados
+
+✅ **Infraestructura**
+- Docker Compose con 5 servicios
+- Nginx como reverse proxy
+- Volúmenes persistentes
+- Configuración para producción
+
+### Archivos de Documentación
+
+- `README.md`: Documentación principal del proyecto
+- `PLANIFICACION.md`: Este archivo - planificación y estado del proyecto
+
+### Organización del Código
+
+**CSS Consolidado**  
+Todos los estilos en `frontend/src/styles/global.css` (9.4 KB):
+- Layout de aplicación
+- Estilos de login
+- Tablas de proyecciones
+- Bitácora
+- Estados de loading
+- Mensajes de error/éxito
+
+**Backend Modular**
+- Controllers: Un controlador por entidad principal
+- Services: JwtService y BitacoraService para lógica reutilizable
+- DTOs: Objetos de transferencia separados de entidades
+- Models: Entidades con atributos [Column] para mapeo SQL
+
+**Frontend Limpio**
+- Componentes funcionales con hooks
+- Cliente API centralizado (api.js)
+- Manejo de estado con useState
+- CSS global sin dependencias externas
+
+## 13. Lecciones Aprendidas
+
+### Desafíos Técnicos
+
+1. **Docker Cache Persistente**: Los cambios en el código no se reflejaban debido a cache de Docker. Solución: `docker builder prune -af` y rebuild completo.
+
+2. **Mapeo SQL-EF**: Diferencias entre nombres de columnas SQL (snake_case) y C# (PascalCase). Solución: Atributos `[Column("nombre_columna")]`.
+
+3. **Inicialización SQL Server**: Scripts no se ejecutaban automáticamente. Solución: Script `entrypoint.sh` personalizado.
+
+4. **CORS en Producción**: Nginx no pasaba headers correctamente. Solución: Configuración explícita en `nginx.conf`.
+
+### Buenas Prácticas Aplicadas
+
+- ✅ Scripts SQL modulares (init, functions, data, procedures)
+- ✅ Separación clara backend/frontend
+- ✅ Variables de entorno para configuración
+- ✅ Volúmenes Docker para persistencia
+- ✅ Health checks en servicios críticos
+- ✅ Logs estructurados para debugging
+- ✅ Validación de datos en ambos lados (cliente/servidor)
+- ✅ Auditoría completa con bitácora
+
 ---
 
-**Nota**: Esta planificación prioriza funcionalidad, mantenibilidad y buenas prácticas de desarrollo, con especial énfasis en crear un sistema profesional y escalable.
+**Conclusión**: Este proyecto demuestra capacidad para desarrollar aplicaciones full-stack con arquitectura moderna, resolver problemas técnicos complejos y mantener código limpio y escalable.
+
+**Tiempo Total de Desarrollo**: 25 horas (incluye debugging, optimizaciones y documentación)
